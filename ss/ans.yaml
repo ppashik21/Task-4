@@ -1,0 +1,25 @@
+#cloud-config
+# Update apt database and install ansible
+packages:
+  - ansible
+
+# Write ansible inventory file
+write_files:
+  - content: |
+      [servers]
+      vmlu01 ansible_host=10.0.20.11
+      vmlu02 ansible_host=10.0.20.12
+
+      [all:vars]
+      ansible_python_interpreter=/usr/bin/python3
+    path: /etc/ansible/hosts
+    owner: root:root
+    permissions: "0644"
+
+# Install docker & add user sysadmin to docker group
+runcmd:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+  - sudo apt update
+  - sudo apt install -y docker-ce
+  - sudo usermod -aG docker sysadmin
